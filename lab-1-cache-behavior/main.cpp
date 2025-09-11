@@ -28,6 +28,14 @@ void algorithm_row_major() { // Acceso por filas
     }
 }
 
+void algorithm_column_major() { // Acceso por columnas
+    for (int j = 0; j < N; ++j) {
+        for (int i = 0; i < N; ++i) {
+            y[i] += A[i][j] * x[j];
+        }
+    }
+}
+
 int main() {
     initialize_data();
 
@@ -37,6 +45,15 @@ int main() {
     
     chrono::duration<double, milli> duration_row = end_row - start_row;
     cout << "Algoritmo por Filas (Row-Major) N=" << N << ": " << duration_row.count() << " ms" << endl;
+
+    initialize_data();
+
+    auto start_col = chrono::high_resolution_clock::now();
+    algorithm_column_major();
+    auto end_col = chrono::high_resolution_clock::now();
+    
+    chrono::duration<double, milli> duration_col = end_col - start_col;
+    cout << "Algoritmo por Columnas (Column-Major) N=" << N << ": " << duration_col.count() << " ms" << endl;
 
     return 0;
 }
