@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -19,7 +20,23 @@ void initialize_data() {
     }
 }
 
+void algorithm_row_major() { // Acceso por filas
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            y[i] += A[i][j] * x[j];
+        }
+    }
+}
+
 int main() {
     initialize_data();
+
+    auto start_row = chrono::high_resolution_clock::now();
+    algorithm_row_major();
+    auto end_row = chrono::high_resolution_clock::now();
+    
+    chrono::duration<double, milli> duration_row = end_row - start_row;
+    cout << "Algoritmo por Filas (Row-Major) N=" << N << ": " << duration_row.count() << " ms" << endl;
+
     return 0;
 }
