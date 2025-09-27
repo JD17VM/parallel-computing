@@ -38,6 +38,28 @@ int main(int argc, char** argv) {
 
     MPI_Scatter(data.data(), local_data_count, MPI_FLOAT, local_data.data(), local_data_count, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
+    vector<int> local_bin_counts(bin_count, 0);
+    float bin_width = (max_meas - min_meas) / bin_count;
+
+    for (float val : local_data) {
+        int bin = (val - min_meas) / bin_width;
+        if (bin >= 0 && bin < bin_count) {
+            local_bin_counts[bin]++;
+        }
+    }
+
+    vector<int> global_bin_counts(bin_count, 0);
+    MPI_Reduce(local_bin_counts.data(), global_bin_counts.data(), bin_count, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (my_rank == 0) {
+        cout << "Histograma final:" << endl;
+        for (int i = 0; i < bin_count; ++i) {
+            float bin_start = min_meas + i * bin_width;
+            float bin_end = bin_start + bin_width;
+            cout << "Bin " << i << " [" << bin_start << ", " << bin_end << "): " << global_bin_counts[i] << " elementos" << endl;
+        }
+    }
+
     MPI_Finalize();
     return 0;
 }
