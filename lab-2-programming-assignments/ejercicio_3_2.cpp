@@ -35,6 +35,15 @@ int main(int argc, char** argv) {
         }
     }
 
+    long long global_number_in_circle;
+    MPI_Reduce(&number_in_circle, &global_number_in_circle, 1, MPI_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (my_rank == 0) {
+        double pi_estimate = 4.0 * global_number_in_circle / ((double)number_of_tosses);
+        cout.precision(15);
+        cout << "Valor estimado de Pi: " << fixed << pi_estimate << endl;
+    }
+
     MPI_Finalize();
     return 0;
 }
