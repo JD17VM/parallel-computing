@@ -49,6 +49,20 @@ int main(int argc, char** argv) {
 
     MPI_Scatter(x.data(), local_n, MPI_DOUBLE, local_x.data(), local_n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
+    vector<double> local_y(n, 0.0);
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < local_n; ++j) {
+            local_y[i] += local_A[i * local_n + j] * local_x[j];
+        }
+    }
+
+    vector<double> y(n);
+    MPI_Reduce(local_y.data(), y.data(), n, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (my_rank == 0) {
+        cout << "Multiplicación matriz-vector (columnas) completada." << endl;
+    }
+
     MPI_Type_free(&col);
     MPI_Type_free(&col_type);
     MPI_Finalize();
