@@ -25,7 +25,6 @@ int main(int argc, char** argv) {
     vector<int> send_buf_b2c;
     for(int i = 0; i < local_n; ++i) {
         if ((block_data[i] % comm_sz) == my_rank) {
-            // Keep it
         } else {
             send_buf_b2c.push_back(block_data[i]);
         }
@@ -34,9 +33,29 @@ int main(int argc, char** argv) {
     MPI_Alltoall(send_buf_b2c.data(), send_buf_b2c.size()/comm_sz, MPI_INT, 
                  cyclic_data.data(), local_n/comm_sz, MPI_INT, MPI_COMM_WORLD);
 
+
     double end_time = MPI_Wtime();
     if (my_rank == 0) {
         cout << "Tiempo de Bloque -> Cíclico: " << end_time - start_time << " s" << endl;
+    }
+    
+    MPI_Barrier(MPI_COMM_WORLD);
+    start_time = MPI_Wtime();
+
+    vector<int> send_buf_c2b;
+    for(int i = 0; i < local_n; ++i){
+        if( (cyclic_data[i] / local_n) == my_rank){
+        } else {
+            send_buf_c2b.push_back(cyclic_data[i]);
+        }
+    }
+    
+    MPI_Alltoall(send_buf_c2b.data(), send_buf_c2b.size()/comm_sz, MPI_INT, 
+                 block_data.data(), local_n/comm_sz, MPI_INT, MPI_COMM_WORLD);
+
+    end_time = MPI_Wtime();
+    if (my_rank == 0) {
+        cout << "Tiempo de Cíclico -> Bloque: " << end_time - start_time << " s" << endl;
     }
 
     MPI_Finalize();
