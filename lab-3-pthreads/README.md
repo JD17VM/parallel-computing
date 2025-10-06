@@ -2,7 +2,7 @@ Libro: An Introduction to Parallel Programming - Peter Pacheco
 
 Implementar el cálculo de PI usando las estratégias:
 
-- Secuencial,
+✔️ Secuencial,
 - Busy-Waiting  dentro del bucle FOR
 - Busy-Waiting  fuera del bucle FOR
 - MUTEX
