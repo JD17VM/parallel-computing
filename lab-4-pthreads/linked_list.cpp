@@ -36,23 +36,39 @@ void ThreadSafeList::Destroy() {
 
 void ThreadSafeList::Init(int initial_size) {
     for (int i = 0; i < initial_size; ++i) {
+        Insert(i * 2);
     }
 }
 
 bool ThreadSafeList::Member(int value) {
-    pthread_rwlock_rdlock(&list_rwlock);
+}
+
+bool ThreadSafeList::Insert(int value) {
+    pthread_rwlock_wrlock(&list_rwlock);
     Node* current = head;
-    while (current != nullptr) {
-        if (current->data == value) {
-            pthread_rwlock_unlock(&list_rwlock);
-            return true;
-        }
+    Node* pred = nullptr;
+
+    while (current != nullptr && current->data < value) {
+        pred = current;
         current = current->next;
     }
+
+    if (current == nullptr || current->data > value) {
+        Node* new_node = new Node(value);
+        new_node->next = current;
+        if (pred == nullptr) {
+            head = new_node;
+        } else {
+            pred->next = new_node;
+        }
+        pthread_rwlock_unlock(&list_rwlock);
+        return true;
+    }
+
     pthread_rwlock_unlock(&list_rwlock);
     return false;
 }
 
-bool ThreadSafeList::Insert(int value) { return false; }
+
 bool ThreadSafeList::Delete(int value) { return false; }
 void ThreadSafeList::Print() {}
