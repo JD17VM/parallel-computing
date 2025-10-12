@@ -1,6 +1,6 @@
 Del Cap 4 del libro, analizar y realizar su propia Implementación del libro de:
 
-* lista enlazada multithread
+- ✔️ lista enlazada multithread
 * matriz-vector
 * threads safety
 

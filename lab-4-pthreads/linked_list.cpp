@@ -70,5 +70,39 @@ bool ThreadSafeList::Insert(int value) {
 }
 
 
-bool ThreadSafeList::Delete(int value) { return false; }
-void ThreadSafeList::Print() {}
+bool ThreadSafeList::Delete(int value) {
+    pthread_rwlock_wrlock(&list_rwlock);
+    Node* current = head;
+    Node* pred = nullptr;
+
+    while (current != nullptr && current->data < value) {
+        pred = current;
+        current = current->next;
+    }
+
+    if (current != nullptr && current->data == value) {
+        if (pred == nullptr) {
+            head = current->next;
+        } else {
+            pred->next = current->next;
+        }
+        delete current;
+        pthread_rwlock_unlock(&list_rwlock);
+        return true;
+    }
+
+    pthread_rwlock_unlock(&list_rwlock);
+    return false;
+}
+
+void ThreadSafeList::Print() {
+    pthread_rwlock_rdlock(&list_rwlock);
+    Node* current = head;
+    cout << "Lista: ";
+    while (current != nullptr) {
+        cout << current->data << " -> ";
+        current = current->next;
+    }
+    cout << "NULL" << endl;
+    pthread_rwlock_unlock(&list_rwlock);
+}
